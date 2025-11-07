@@ -1,0 +1,47 @@
+# ============================================
+# DNS TUNNELING DETECTION RULES
+# ============================================
+
+# Rule 1: Detect abnormally long DNS query names (>50 characters)
+alert dns any any -> any 53 (msg:"EXFIL: DNS Tunneling - Suspicious long query name detected"; dns.query; pcre:"/^.{50,}/"; classtype:policy-violation; sid:1000001; rev:1;)
+
+# Rule 2: Detect very high frequency of DNS queries from single source
+alert dns any any -> any 53 (msg:"EXFIL: DNS Tunneling - High query rate from single host"; threshold:type both, track by_src, count 30, seconds 60; classtype:attempted-recon; sid:1000002; rev:1;)
+
+# Rule 3: Detect Base64-like patterns in DNS queries (encoding indicator)
+alert dns any any -> any 53 (msg:"EXFIL: DNS Tunneling - Base64 pattern in query"; dns.query; pcre:"/[A-Za-z0-9+\/=]{40,}/"; classtype:policy-violation; sid:1000003; rev:1;)
+
+# Rule 4: Detect TXT record queries (commonly used in DNS tunneling)
+alert dns any any -> any 53 (msg:"EXFIL: DNS Tunneling - Suspicious TXT record query"; dns.query; content:"TXT"; nocase; threshold:type both, track by_src, count 10, seconds 30; sid:1000004; rev:1;)
+
+# ============================================
+# SSH TUNNELING DETECTION RULES  
+# ============================================
+
+# Rule 5: Detect long-lived SSH connections (potential tunneling)
+alert tcp any any -> any 22 (msg:"TUNNEL: Long-lived SSH connection detected"; flow:established,to_server; threshold:type limit, track by_src, count 1, seconds 600; classtype:policy-violation; sid:1000005; rev:1;)
+
+# Rule 6: Detect high volume data transfer over SSH
+alert tcp any any -> any 22 (msg:"TUNNEL: High volume SSH data transfer"; flow:established; threshold:type threshold, track by_src, count 100, seconds 60; classtype:policy-violation; sid:1000006; rev:1;)
+
+# ============================================
+# HTTP/HTTPS EXFILTRATION DETECTION RULES
+# ============================================
+
+# Rule 7: Detect HTTP POST with large payload (potential file upload)
+alert http any any -> any any (msg:"EXFIL: HTTP POST with large payload"; flow:established,to_server; http.method; content:"POST"; http.request_body; dsize:>5000; classtype:policy-violation; sid:1000007; rev:1;)
+
+# Rule 8: Detect Base64 data in custom HTTP headers
+alert http any any -> any any (msg:"EXFIL: Suspicious Base64 data in HTTP headers"; flow:established,to_server; http.header; pcre:"/X-[A-Za-z-]+:\s*[A-Za-z0-9+\/=]{50,}/i"; classtype:policy-violation; sid:1000008; rev:1;)
+
+# Rule 9: Detect multiple rapid POST requests (chunked exfiltration)
+alert http any any -> any any (msg:"EXFIL: Multiple rapid HTTP POST requests"; flow:established,to_server; http.method; content:"POST"; threshold:type both, track by_src, count 10, seconds 30; classtype:policy-violation; sid:1000009; rev:1;)
+
+# Rule 10: Detect Base64 patterns in HTTP request body
+alert http any any -> any any (msg:"EXFIL: Base64 encoded data in POST body"; flow:established,to_server; http.method; content:"POST"; http.request_body; pcre:"/[A-Za-z0-9+\/=]{100,}/"; classtype:policy-violation; sid:1000010; rev:1;)
+
+# Rule 11: Detect suspicious data in cookies
+alert http any any -> any any (msg:"EXFIL: Large cookie value (potential data exfiltration)"; flow:established,to_server; http.cookie; pcre:"/=[A-Za-z0-9+\/=]{80,}/"; classtype:policy-violation; sid:1000011; rev:1;)
+
+# Rule 12: Detect suspicious query parameters with encoded data
+alert http any any -> any any (msg:"EXFIL: Encoded data in URL parameters"; flow:established,to_server; http.uri; pcre:"/\?.*data=[A-Za-z0-9+\/=]{40,}/"; classtype:policy-violation; sid:1000012; rev:1;)
