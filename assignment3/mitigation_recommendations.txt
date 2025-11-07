@@ -1,0 +1,121 @@
+# MITIGATION RECOMMENDATIONS FOR EGRESS-BUSTING ATTACKS
+
+## 1. DNS TUNNELING MITIGATIONS
+
+### Technical Controls:
+- Implement DNS query length limits (block queries >50 characters)
+- Monitor DNS query frequency per host (alert on >30 queries/min)
+- Block direct DNS to external resolvers; force use of internal DNS
+- Deploy DNS sinkhole for suspicious domains
+- Enable DNS query logging and analysis
+
+### Policy Controls:
+- Whitelist approved external DNS servers only
+- Implement split-horizon DNS
+- Regular review of DNS logs for anomalies
+
+### Detection Improvements:
+- Use machine learning for DNS traffic baseline
+- Monitor for TXT/NULL record abuse
+- Track entropy of DNS query strings
+- Implement Zeek scripts for behavioral analysis
+
+## 2. SSH TUNNELING MITIGATIONS
+
+### Technical Controls:
+- Disable SSH port forwarding: AllowTcpForwarding no in sshd_config
+- Restrict PermitOpen to specific destinations
+- Limit PermitTunnel to 'no' or specific use cases
+- Implement SSH bastion/jump hosts with strict logging
+- Deploy multi-factor authentication (MFA) for all SSH access
+
+### Network Controls:
+- Monitor for long-lived SSH connections (>10 minutes)
+- Alert on high-volume SSH data transfers
+- Restrict SSH to specific source IPs via firewall
+- Block SSH to external IPs except approved servers
+
+### Configuration Hardening:
+# Add to /etc/ssh/sshd_config:
+AllowTcpForwarding no
+PermitTunnel no
+GatewayPorts no
+X11Forwarding no
+
+### Detection Improvements:
+- Baseline normal SSH session duration and data volume
+- Alert on SSH connections to unusual ports
+- Monitor auth.log for forwarding attempts
+
+## 3. HTTP/HTTPS EXFILTRATION MITIGATIONS
+
+### Technical Controls:
+- Deploy TLS inspection proxy for HTTPS traffic
+- Implement DLP (Data Loss Prevention) solutions
+- Monitor POST request sizes and frequency
+- Analyze HTTP header anomalies
+- Block direct internet access; force web proxy use
+
+### Network Controls:
+- Whitelist approved external domains/IPs only
+- Rate-limit HTTP POST requests
+- Block POST to suspicious endpoints (/upload, /file, /data)
+- Monitor for base64-encoded payloads in requests
+
+### Application Controls:
+- Implement Content Security Policy (CSP)
+- Deploy web application firewalls (WAF)
+- Enable HTTP request logging with full headers
+- Use allowlist for approved cloud storage services
+
+### Detection Improvements:
+- Calculate entropy of HTTP payloads (high entropy = potential encryption/encoding)
+- Monitor for repetitive POST patterns
+- Track data volume per destination over time
+- Alert on unusual user-agent strings
+- Detect base64 patterns in headers, cookies, parameters
+
+## 4. GENERAL EGRESS CONTROLS
+
+### Network Segmentation:
+- Implement DMZ for internet-facing services
+- Restrict internal hosts from direct internet access
+- Use jump/bastion hosts for administrative access
+
+### Monitoring & Logging:
+- Centralize logs in SIEM
+- Enable full packet capture for critical segments
+- Deploy network behavior analytics (NBA)
+- Regular log review and threat hunting
+
+### Zero Trust Principles:
+- Verify every connection, even internal
+- Implement least-privilege access
+- Continuous authentication and authorization
+- Micro-segmentation of network
+
+### Incident Response:
+- Develop playbooks for detected exfiltration
+- Automated blocking of IOCs
+- Regular tabletop exercises
+- Maintain offline backups
+
+## PRIORITY IMPLEMENTATION ORDER:
+
+1. HIGH PRIORITY (Implement immediately):
+   - Disable SSH port forwarding
+   - Implement DNS query monitoring
+   - Deploy web proxy with allowlisting
+   - Enable comprehensive logging
+
+2. MEDIUM PRIORITY (Implement within 30 days):
+   - Deploy TLS inspection
+   - Implement DLP solution
+   - Configure IDS with custom rules
+   - Centralize logs in SIEM
+
+3. LOW PRIORITY (Implement within 90 days):
+   - Machine learning for anomaly detection
+   - Full network segmentation
+   - Advanced threat hunting capabilities
+   - Regular red team exercises

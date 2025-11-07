@@ -1,13 +1,10 @@
-========================================
 ASSIGNMENT 3 SUBMISSION PACKAGE
-========================================
 
 Student: Tandin Zangmo
 Module: SWS303
 Date: November 7, 2025
 
 FILES INCLUDED:
-
 1. Assignment3_Report.md          - Main report document (6 pages)
 2. dns_tunnel.pcap                - DNS exfiltration traffic capture (4.9KB)
 3. ssh_capture.pcap               - SSH tunneling traffic capture (504 bytes)

@@ -1,5 +1,3 @@
-# SWS303_02230305_A3
-
 # Assignment 3: Egress-Busting Detection and Prevention
 ## Data Exfiltration Analysis and IDS Implementation
 
@@ -7,6 +5,7 @@
 **Module Code:** SWS303  
 **Date:** November 7, 2025  
 **Lab Environment:** Ubuntu Desktop (Victim: 10.2.38.187) & Kali Linux (Attacker: 10.2.38.82)
+
 
 ## 1. Executive Summary
 
@@ -265,7 +264,6 @@ alert http any any -> any any (msg:"HTTP Exfil - Encoded URL params";
 5. **Anomaly Detection:** Monitor for unusual upload patterns and data volumes
 6. **File Upload Restrictions:** Limit file sizes and types on web applications
 
-
 ## 6. Comprehensive IDS Rule Summary
 
 ### 6.1 Rule Effectiveness Matrix
@@ -297,7 +295,6 @@ alert http any any -> any any (msg:"HTTP Exfil - Encoded URL params";
 - Implement time-of-day adjustments for SSH session duration alerts
 - Add SNI whitelisting for HTTPS exfiltration rules
 
-
 ## 7. Network Defense Strategy
 
 ### 7.1 Layered Security Approach
@@ -324,7 +321,6 @@ alert http any any -> any any (msg:"HTTP Exfil - Encoded URL params";
 3. **Egress Monitoring:** All outbound traffic must traverse monitored egress points
 4. **Endpoint Protection:** Deploy EDR solutions to detect pre-exfiltration behaviors
 5. **User Education:** Train users on data handling and social engineering risks
-
 
 ## 8. Conclusion
 
@@ -369,11 +365,3 @@ These techniques mirror actual threat actor TTPs (MITRE ATT&CK T1048, T1572, T10
 - **Suricata Version:** Latest from apt repository
 - **tcpdump Version:** 4.99.5
 - **Test Date:** November 7, 2025
-- **Test Duration:** Approximately 60 minutes
-
-### Appendix C: Ethical Considerations
-All testing was conducted in isolated lab environment with:
-- No production systems accessed
-- No third-party networks involved (except public test endpoints like httpbin.org)
-- No actual sensitive data exfiltrated
-- All activities authorized by course instructor
